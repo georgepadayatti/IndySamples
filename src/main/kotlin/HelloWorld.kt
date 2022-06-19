@@ -4,15 +4,15 @@ import org.hyperledger.indy.sdk.wallet.Wallet
 
 fun main() {
 
-//    Load libindy.dylib from LD_LIBRARY_PATH
+    // Load libindy.dylib from LD_LIBRARY_PATH
     System.loadLibrary("indy")
 
-//    Initialise libindy
+    // Initialise libindy
     if (!LibIndy.isInitialized()) {
         LibIndy.init()
     }
 
-//    Create a sample Indy wallet
+    // Create a sample Indy wallet
     val walletName = "SampleWallet"
     val walletType = "default"
     val walletConfig = "{ \"id\":\"$walletName\", \"storage_type\":\"$walletType\"}"
