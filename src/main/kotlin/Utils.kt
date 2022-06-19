@@ -1,7 +1,9 @@
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import org.hyperledger.indy.sdk.IndyException
+import org.json.JSONObject
 import org.hyperledger.indy.sdk.LibIndy
 import org.hyperledger.indy.sdk.wallet.Wallet
+import java.util.concurrent.ExecutionException
+import org.hyperledger.indy.sdk.wallet.WalletExistsException
 
 /**
  * Initialise Indy SDK
@@ -20,15 +22,40 @@ fun initLibIndy() {
  * Create Indy wallet
  */
 fun createWallet(walletName: String, walletKey: String) {
-    val walletType = "default"
 
-    val walletConfig = HashMap<String, String>()
-    walletConfig["id"] = walletName
-    walletConfig["storage_type"] = walletType
+    val walletConfig = JSONObject()
+    walletConfig.put("id", walletName)
+    walletConfig.put("storage_type", "default")
 
-    val walletCredentials = HashMap<String, String>()
-    walletCredentials["key"] = walletKey
-    walletCredentials["key_derivation_method"] = "RAW"
+    val walletCredentials = JSONObject()
+    walletCredentials.put("key", walletKey)
+    walletCredentials.put("key_derivation_method", "ARGON2I_MOD")
 
-    Wallet.createWallet(Json.encodeToString(walletConfig), Json.encodeToString(walletCredentials))
+    try {
+
+        // Create wallet
+        Wallet.createWallet(walletConfig.toString(), walletCredentials.toString()).get()
+
+    } catch (e: ExecutionException) {
+
+        // https://stackoverflow.com/questions/10437890/what-is-the-best-way-to-handle-an-executionexception
+        try {
+
+            // Throw actual exception
+            throw e.cause!!
+
+        } catch (wee: WalletExistsException) {
+
+            // Wallet with this name already exists
+            // Suppress exception (Do nothing for now)
+
+        } catch (ie: IndyException) {
+
+            // Throw any other exception
+            throw ie
+
+        }
+
+    }
+
 }
