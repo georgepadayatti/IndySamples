@@ -1,5 +1,3 @@
-package com.indy.samples
-
 import org.hyperledger.indy.sdk.LibIndy
 import org.hyperledger.indy.sdk.wallet.Wallet
 
